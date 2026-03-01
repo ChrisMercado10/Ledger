@@ -1,0 +1,2168 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Ledger" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="theme-color" content="#0d0f0e" />
+<title>Ledger — Personal Finance</title>
+<link rel="manifest" href="./manifest.json" />
+<link rel="apple-touch-icon" href="./icon-192.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+/* ================================================
+   RESET & ROOT — All colors !important for Safari
+   ================================================ */
+*, *::before, *::after {
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none !important;
+}
+
+:root {
+  --bg: #0d0f0e;
+  --surface: #141714;
+  --surface2: #1c201c;
+  --surface3: #232823;
+  --border: #2a302a;
+  --accent: #a8e063;
+  --accent2: #5be39a;
+  --danger: #f06060;
+  --warning: #f0b060;
+  --blue: #60a8f0;
+  --purple: #b060f0;
+  --text: #e8ede8;
+  --text2: #8a978a;
+  --text3: #5a675a;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html {
+  background-color: #0d0f0e !important;
+  -webkit-text-size-adjust: 100% !important;
+}
+
+body {
+  font-family: 'DM Sans', -apple-system, sans-serif !important;
+  background-color: #0d0f0e !important;
+  color: #e8ede8 !important;
+  min-height: 100vh !important;
+  min-height: -webkit-fill-available !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  overflow-x: hidden !important;
+  -webkit-font-smoothing: antialiased !important;
+}
+
+/* ================================================
+   TYPOGRAPHY HELPERS
+   ================================================ */
+.font-display { font-family: 'DM Serif Display', serif !important; }
+.font-mono   { font-family: 'DM Mono', monospace !important; }
+
+/* ================================================
+   SETUP OVERLAY
+   ================================================ */
+#setup-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  background-color: #0d0f0e !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 1000 !important;
+  padding: 24px !important;
+  padding-top: calc(24px + env(safe-area-inset-top, 0px)) !important;
+  overflow-y: auto !important;
+}
+
+.setup-card {
+  background-color: #141714 !important;
+  border: 1px solid #2a302a !important;
+  border-radius: 24px !important;
+  padding: 40px 32px !important;
+  max-width: 520px !important;
+  width: 100% !important;
+  text-align: center !important;
+}
+
+.setup-card h1 {
+  font-family: 'DM Serif Display', serif !important;
+  font-size: 2.4rem !important;
+  color: #a8e063 !important;
+  margin-bottom: 8px !important;
+}
+
+.setup-card > p {
+  color: #8a978a !important;
+  margin-bottom: 28px !important;
+}
+
+.setup-steps { text-align: left !important; margin-bottom: 28px !important; }
+
+.setup-step {
+  display: flex !important;
+  gap: 12px !important;
+  margin-bottom: 20px !important;
+  align-items: flex-start !important;
+}
+
+.step-num {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  border-radius: 50% !important;
+  background-color: #a8e063 !important;
+  color: #000000 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-family: 'DM Mono', monospace !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  margin-top: 2px !important;
+}
+
+.step-content strong { color: #e8ede8 !important; display: block !important; margin-bottom: 4px !important; }
+.step-content span   { color: #8a978a !important; font-size: 13px !important; }
+.step-content a      { color: #a8e063 !important; text-decoration: none !important; }
+
+/* ================================================
+   FORM INPUTS — Most critical Safari override area
+   ================================================ */
+.input-group {
+  margin-bottom: 14px !important;
+  text-align: left !important;
+}
+
+.input-group label {
+  display: block !important;
+  color: #8a978a !important;
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  margin-bottom: 6px !important;
+}
+
+.input-group input,
+.input-group select,
+.input-group textarea {
+  width: 100% !important;
+  background-color: #1c201c !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  border: 1px solid #2a302a !important;
+  border-radius: 10px !important;
+  padding: 11px 14px !important;
+  color: #e8ede8 !important;
+  font-family: 'DM Mono', monospace !important;
+  font-size: 13px !important;
+  outline: none !important;
+  transition: border-color 0.2s !important;
+}
+
+.input-group input:focus,
+.input-group select:focus,
+.input-group textarea:focus {
+  border-color: #a8e063 !important;
+  background-color: #1c201c !important;
+}
+
+/* iOS date/time input fix */
+input[type="date"],
+input[type="time"],
+input[type="number"] {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  background-color: #1c201c !important;
+  color: #e8ede8 !important;
+}
+
+/* Select arrow */
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a978a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 12px center !important;
+  padding-right: 32px !important;
+}
+
+/* Option elements (limited styling in Safari) */
+option {
+  background-color: #1c201c !important;
+  color: #e8ede8 !important;
+}
+
+/* ================================================
+   BUTTONS
+   ================================================ */
+.btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  border: none !important;
+  cursor: pointer !important;
+  font-family: 'DM Sans', sans-serif !important;
+  font-weight: 500 !important;
+  transition: opacity 0.15s, transform 0.15s !important;
+  text-decoration: none !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  white-space: nowrap !important;
+}
+.btn:active { opacity: 0.8 !important; transform: scale(0.97) !important; }
+
+.btn-lg  { padding: 13px 24px !important; font-size: 15px !important; border-radius: 12px !important; }
+.btn-md  { padding: 10px 18px !important; font-size: 13px !important; border-radius: 10px !important; }
+.btn-sm  { padding: 7px 13px  !important; font-size: 12px !important; border-radius: 8px  !important; }
+
+.btn-primary {
+  background-color: #a8e063 !important;
+  color: #000000 !important;
+}
+.btn-primary:hover { opacity: 0.9 !important; }
+
+.btn-secondary {
+  background-color: #1c201c !important;
+  color: #e8ede8 !important;
+  border: 1px solid #2a302a !important;
+}
+.btn-secondary:hover { border-color: #a8e063 !important; color: #a8e063 !important; }
+
+.btn-ghost {
+  background-color: transparent !important;
+  color: #8a978a !important;
+  border: 1px solid #2a302a !important;
+}
+.btn-ghost:hover { border-color: #a8e063 !important; color: #a8e063 !important; }
+
+.btn-danger {
+  background-color: #f06060 !important;
+  color: #ffffff !important;
+}
+
+.btn-full { width: 100% !important; }
+
+.delete-btn {
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  color: #5a675a !important;
+  padding: 4px 6px !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  line-height: 1 !important;
+}
+.delete-btn:hover { color: #f06060 !important; }
+
+/* ================================================
+   APP SHELL
+   ================================================ */
+#app { display: none !important; min-height: 100vh !important; }
+
+.app-header {
+  background-color: #0d0f0e !important;
+  border-bottom: 1px solid #2a302a !important;
+  padding: 0 16px !important;
+  padding-top: env(safe-area-inset-top, 0px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  height: calc(56px + env(safe-area-inset-top, 0px)) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 100 !important;
+}
+
+.app-logo {
+  font-family: 'DM Serif Display', serif !important;
+  font-size: 1.4rem !important;
+  color: #a8e063 !important;
+}
+
+.header-right { display: flex !important; align-items: center !important; gap: 8px !important; }
+
+.sync-status {
+  font-family: 'DM Mono', monospace !important;
+  font-size: 11px !important;
+  color: #5a675a !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+}
+
+.sync-dot {
+  width: 6px !important;
+  height: 6px !important;
+  border-radius: 50% !important;
+  background-color: #5be39a !important;
+  animation: pulse 2s infinite !important;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+/* ================================================
+   BOTTOM NAV (mobile-first)
+   ================================================ */
+.bottom-nav {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  background-color: #141714 !important;
+  border-top: 1px solid #2a302a !important;
+  display: flex !important;
+  padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+  z-index: 100 !important;
+}
+
+.nav-tab {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 10px 4px !important;
+  cursor: pointer !important;
+  color: #5a675a !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  gap: 4px !important;
+  transition: color 0.15s !important;
+  text-align: center !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+.nav-tab svg { width: 20px !important; height: 20px !important; }
+.nav-tab.active { color: #a8e063 !important; }
+.nav-tab span { font-size: 10px !important; }
+
+/* More menu */
+.more-menu {
+  position: fixed !important;
+  bottom: calc(60px + env(safe-area-inset-bottom, 0px)) !important;
+  left: 0 !important;
+  right: 0 !important;
+  background-color: #141714 !important;
+  border-top: 1px solid #2a302a !important;
+  padding: 8px !important;
+  z-index: 99 !important;
+  display: none !important;
+}
+.more-menu.open { display: block !important; }
+.more-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 13px 16px !important;
+  border-radius: 10px !important;
+  cursor: pointer !important;
+  color: #8a978a !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+.more-item:hover, .more-item.active { background-color: #1c201c !important; color: #a8e063 !important; }
+.more-item svg { width: 18px !important; height: 18px !important; }
+
+/* ================================================
+   MAIN CONTENT
+   ================================================ */
+.main-content {
+  padding: 20px 16px !important;
+  padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)) !important;
+  overflow-y: auto !important;
+  min-height: calc(100vh - 56px) !important;
+  background-color: #0d0f0e !important;
+}
+
+/* ================================================
+   PAGE HEADERS
+   ================================================ */
+.page-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 20px !important;
+  flex-wrap: wrap !important;
+  gap: 10px !important;
+}
+.page-title {
+  font-family: 'DM Serif Display', serif !important;
+  font-size: 1.7rem !important;
+  color: #e8ede8 !important;
+}
+.page-actions { display: flex !important; gap: 8px !important; flex-wrap: wrap !important; }
+
+.month-nav {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin-bottom: 20px !important;
+}
+.month-nav h2 {
+  font-family: 'DM Serif Display', serif !important;
+  font-size: 1.3rem !important;
+  color: #e8ede8 !important;
+  flex: 1 !important;
+  text-align: center !important;
+}
+.month-btn {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 50% !important;
+  border: 1px solid #2a302a !important;
+  background-color: #141714 !important;
+  color: #8a978a !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  font-size: 16px !important;
+  flex-shrink: 0 !important;
+}
+.month-btn:active { background-color: #1c201c !important; color: #a8e063 !important; }
+
+/* ================================================
+   SUMMARY CARDS
+   ================================================ */
+.summary-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 10px !important;
+  margin-bottom: 20px !important;
+}
+.summary-grid-4 { grid-template-columns: 1fr 1fr !important; }
+
+.summary-card {
+  background-color: #141714 !important;
+  border: 1px solid #2a302a !important;
+  border-radius: 14px !important;
+  padding: 14px !important;
+}
+.summary-card .s-label {
+  font-size: 10px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  color: #5a675a !important;
+  margin-bottom: 6px !important;
+}
+.summary-card .s-amount {
+  font-family: 'DM Mono', monospace !important;
+  font-size: 1.25rem !important;
+  font-weight: 500 !important;
+  color: #e8ede8 !important;
+}
+.summary-card .s-sub { font-size: 11px !important; color: #5a675a !important; margin-top: 2px !important; }
+
+.col-green  { color: #a8e063 !important; }
+.col-red    { color: #f06060 !important; }
+.col-blue   { color: #60a8f0 !important; }
+.col-yellow { color: #f0b060 !important; }
+.col-teal   { color: #5be39a !important; }
+.col-muted  { color: #8a978a !important; }
+.col-dim    { color: #5a675a !important; }
+.col-text   { color: #e8ede8 !important; }
+
+/* ================================================
+   CARDS
+   ================================================ */
+.card {
+  background-color: #141714 !important;
+  border: 1px solid #2a302a !important;
+  border-radius: 14px !important;
+  padding: 16px !important;
+  margin-bottom: 14px !important;
+}
+.card-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 14px !important;
+}
+.card-title {
+  font-family: 'DM Serif Display', serif !important;
+  font-size: 1rem !important;
+  color: #e8ede8 !important;
+}
+
+/* ================================================
+   TABLES
+   ================================================ */
+.table-wrap { overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; }
+.data-table { width: 100% !important; border-collapse: collapse !important; }
+.data-table th {
+  font-size: 10px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.07em !important;
+  color: #5a675a !important;
+  text-align: left !important;
+  padding: 5px 8px !important;
+  border-bottom: 1px solid #2a302a !important;
+  white-space: nowrap !important;
+}
+.data-table td {
+  padding: 10px 8px !important;
+  border-bottom: 1px solid #1c201c !important;
+  font-size: 13px !important;
+  color: #e8ede8 !important;
+  vertical-align: middle !important;
+}
+.data-table tr:last-child td { border-bottom: none !important; }
+
+/* ================================================
+   PROGRESS BARS
+   ================================================ */
+.progress-bar {
+  height: 6px !important;
+  background-color: #232823 !important;
+  border-radius: 10px !important;
+  overflow: hidden !important;
+  margin-top: 5px !important;
+}
+.progress-fill {
+  height: 100% !important;
+  border-radius: 10px !important;
+  transition: width 0.5s ease !important;
+}
+
+/* ================================================
+   BUDGET ROWS
+   ================================================ */
+.budget-row { margin-bottom: 10px !important; }
+.budget-row-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 3px !important;
+}
+.budget-row-label  { font-size: 13px !important; font-weight: 500 !important; color: #e8ede8 !important; }
+.budget-row-amounts { font-family: 'DM Mono', monospace !important; font-size: 12px !important; color: #8a978a !important; }
+
+/* ================================================
+   TAGS / BADGES
+   ================================================ */
+.badge {
+  display: inline-block !important;
+  padding: 3px 8px !important;
+  border-radius: 20px !important;
+  font-size: 11px !important;
+  font-family: 'DM Mono', monospace !important;
+  font-weight: 500 !important;
+}
+.badge-green  { background-color: rgba(168,224,99,0.15)  !important; color: #a8e063 !important; }
+.badge-red    { background-color: rgba(240,96,96,0.15)   !important; color: #f06060 !important; }
+.badge-blue   { background-color: rgba(96,168,240,0.15)  !important; color: #60a8f0 !important; }
+.badge-yellow { background-color: rgba(240,176,96,0.15)  !important; color: #f0b060 !important; }
+.badge-teal   { background-color: rgba(91,227,154,0.15)  !important; color: #5be39a !important; }
+
+/* ================================================
+   MODALS
+   ================================================ */
+.modal-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  background-color: rgba(0,0,0,0.75) !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  z-index: 500 !important;
+  padding: 0 !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+.modal {
+  background-color: #141714 !important;
+  border: 1px solid #2a302a !important;
+  border-radius: 20px 20px 0 0 !important;
+  padding: 24px 20px !important;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important;
+  width: 100% !important;
+  max-height: 92vh !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+.modal-handle {
+  width: 36px !important;
+  height: 4px !important;
+  background-color: #2a302a !important;
+  border-radius: 2px !important;
+  margin: 0 auto 20px !important;
+}
+
+.modal h3 {
+  font-family: 'DM Serif Display', serif !important;
+  font-size: 1.3rem !important;
+  color: #e8ede8 !important;
+  margin-bottom: 18px !important;
+}
+.modal-actions {
+  display: flex !important;
+  gap: 10px !important;
+  margin-top: 20px !important;
+}
+
+/* ================================================
+   FORM LAYOUT
+   ================================================ */
+.form-row {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 10px !important;
+}
+
+/* ================================================
+   CREDIT CARD WIDGET
+   ================================================ */
+.cc-card {
+  background-color: #1c201c !important;
+  border: 1px solid #2a302a !important;
+  border-radius: 14px !important;
+  padding: 16px !important;
+  margin-bottom: 12px !important;
+}
+.cc-top { display: flex !important; align-items: flex-start !important; justify-content: space-between !important; margin-bottom: 10px !important; }
+.cc-name { font-weight: 600 !important; font-size: 14px !important; color: #e8ede8 !important; }
+.cc-network { font-size: 11px !important; color: #5a675a !important; font-family: 'DM Mono', monospace !important; }
+.cc-balance { font-family: 'DM Mono', monospace !important; font-size: 1.4rem !important; color: #f0b060 !important; }
+.cc-stats { display: grid !important; grid-template-columns: 1fr 1fr 1fr !important; gap: 10px !important; margin-top: 12px !important; }
+.cc-stat label { font-size: 10px !important; text-transform: uppercase !important; letter-spacing: 0.06em !important; color: #5a675a !important; display: block !important; margin-bottom: 2px !important; }
+.cc-stat span   { font-family: 'DM Mono', monospace !important; font-size: 12px !important; color: #e8ede8 !important; }
+
+/* ================================================
+   LOAN CARD
+   ================================================ */
+.loan-card {
+  background-color: #1c201c !important;
+  border: 1px solid #2a302a !important;
+  border-radius: 14px !important;
+  padding: 16px !important;
+  margin-bottom: 12px !important;
+}
+.loan-top { display: flex !important; align-items: flex-start !important; justify-content: space-between !important; margin-bottom: 8px !important; }
+.loan-name { font-weight: 600 !important; font-size: 14px !important; color: #e8ede8 !important; }
+.loan-servicer { font-size: 11px !important; color: #5a675a !important; font-family: 'DM Mono', monospace !important; }
+.loan-balance { font-family: 'DM Mono', monospace !important; font-size: 1.3rem !important; color: #f06060 !important; }
+.loan-stats { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; margin-top: 10px !important; }
+.loan-stat label { font-size: 10px !important; text-transform: uppercase !important; letter-spacing: 0.06em !important; color: #5a675a !important; display: block !important; margin-bottom: 2px !important; }
+.loan-stat span   { font-family: 'DM Mono', monospace !important; font-size: 12px !important; color: #e8ede8 !important; }
+
+/* ================================================
+   SAVINGS GOAL CARD
+   ================================================ */
+.goal-card {
+  background-color: #1c201c !important;
+  border-radius: 12px !important;
+  padding: 15px !important;
+  margin-bottom: 10px !important;
+  border: 1px solid #2a302a !important;
+}
+.goal-top { display: flex !important; align-items: center !important; justify-content: space-between !important; margin-bottom: 6px !important; }
+.goal-name { font-weight: 600 !important; font-size: 14px !important; color: #e8ede8 !important; }
+.goal-mini-stats { display: grid !important; grid-template-columns: 1fr 1fr 1fr !important; gap: 8px !important; margin-top: 10px !important; }
+.goal-mini-stat label { font-size: 10px !important; text-transform: uppercase !important; color: #5a675a !important; display: block !important; margin-bottom: 2px !important; }
+.goal-mini-stat span  { font-family: 'DM Mono', monospace !important; font-size: 12px !important; color: #e8ede8 !important; }
+
+/* ================================================
+   BUDGET CATEGORY BLOCK
+   ================================================ */
+.cat-block {
+  background-color: #1c201c !important;
+  border-radius: 10px !important;
+  padding: 12px !important;
+  margin-bottom: 8px !important;
+  border: 1px solid #2a302a !important;
+}
+
+/* ================================================
+   EMPTY STATE
+   ================================================ */
+.empty-state {
+  text-align: center !important;
+  padding: 32px 16px !important;
+  color: #5a675a !important;
+  font-size: 13px !important;
+}
+
+/* ================================================
+   TOAST
+   ================================================ */
+.toast {
+  position: fixed !important;
+  bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  background-color: #232823 !important;
+  border: 1px solid #a8e063 !important;
+  border-radius: 10px !important;
+  padding: 11px 20px !important;
+  font-size: 13px !important;
+  color: #e8ede8 !important;
+  z-index: 9999 !important;
+  white-space: nowrap !important;
+  display: none !important;
+  font-family: 'DM Sans', sans-serif !important;
+}
+.toast.show { display: block !important; animation: slideUp 0.25s ease !important; }
+@keyframes slideUp { from { transform: translateX(-50%) translateY(10px); opacity:0; } to { transform: translateX(-50%) translateY(0); opacity:1; } }
+
+/* ================================================
+   LOADING SPINNER
+   ================================================ */
+.spinner {
+  display: inline-block !important;
+  width: 14px !important;
+  height: 14px !important;
+  border: 2px solid #2a302a !important;
+  border-top-color: #a8e063 !important;
+  border-radius: 50% !important;
+  animation: spin 0.7s linear infinite !important;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ================================================
+   SCROLLBAR
+   ================================================ */
+::-webkit-scrollbar { width: 4px !important; }
+::-webkit-scrollbar-track { background: transparent !important; }
+::-webkit-scrollbar-thumb { background-color: #2a302a !important; border-radius: 10px !important; }
+
+/* ================================================
+   UTILITIES
+   ================================================ */
+.text-right  { text-align: right !important; }
+.text-center { text-align: center !important; }
+.mt-4  { margin-top: 4px  !important; }
+.mt-8  { margin-top: 8px  !important; }
+.mt-12 { margin-top: 12px !important; }
+.mt-16 { margin-top: 16px !important; }
+.mb-4  { margin-bottom: 4px  !important; }
+.mb-8  { margin-bottom: 8px  !important; }
+.mb-12 { margin-bottom: 12px !important; }
+.flex  { display: flex !important; }
+.items-center { align-items: center !important; }
+.justify-between { justify-content: space-between !important; }
+.gap-8 { gap: 8px !important; }
+.gap-10 { gap: 10px !important; }
+.mono { font-family: 'DM Mono', monospace !important; }
+
+/* ================================================
+   SCRIPT MODAL / CODE AREA
+   ================================================ */
+.code-area {
+  width: 100% !important;
+  height: 220px !important;
+  background-color: #1c201c !important;
+  border: 1px solid #2a302a !important;
+  border-radius: 10px !important;
+  padding: 14px !important;
+  color: #a8e063 !important;
+  font-family: 'DM Mono', monospace !important;
+  font-size: 11px !important;
+  resize: none !important;
+  outline: none !important;
+  -webkit-appearance: none !important;
+}
+</style>
+
+</head>
+<body>
+
+<!-- ================================================
+     SETUP OVERLAY
+     ================================================ -->
+
+<div id="setup-overlay">
+  <div class="setup-card">
+    <h1 class="font-display">Ledger</h1>
+    <p>Personal finance command center, backed by your own Google Sheet.</p>
+
+```
+<div class="setup-steps">
+  <div class="setup-step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <strong>Create a Google Sheet</strong>
+      <span>Go to <a href="https://sheets.new" target="_blank">sheets.new</a> and create a blank spreadsheet. Name it anything (e.g. "My Budget").</span>
+    </div>
+  </div>
+  <div class="setup-step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <strong>Open Apps Script</strong>
+      <span>In your sheet click <strong style="color:#e8ede8 !important">Extensions → Apps Script</strong>. Delete any existing code, paste the script below, then click Save.</span>
+    </div>
+  </div>
+  <div class="setup-step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <strong>Deploy as Web App</strong>
+      <span>Click <strong style="color:#e8ede8 !important">Deploy → New deployment</strong>. Type: Web app. Execute as: <strong style="color:#e8ede8 !important">Me</strong>. Access: <strong style="color:#e8ede8 !important">Anyone</strong>. Click Deploy, authorize, copy the URL.</span>
+    </div>
+  </div>
+  <div class="setup-step">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <strong>Paste the URL below</strong>
+      <span>Enter your Web App deployment URL and tap Connect.</span>
+    </div>
+  </div>
+</div>
+
+<button class="btn btn-secondary btn-md" style="width:100%;margin-bottom:12px !important;" onclick="showScriptModal()">
+  📋 View Apps Script Code
+</button>
+
+<div class="input-group">
+  <label>Apps Script Web App URL</label>
+  <input type="url" id="sheet-url" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+</div>
+<button class="btn btn-primary btn-lg btn-full" onclick="connectSheet()">
+  <span id="connect-btn-text">Connect to Google Sheets</span>
+</button>
+<p style="margin-top:14px !important;font-size:11px !important;color:#5a675a !important;">Your data stays in your own Google account. We never see it.</p>
+```
+
+  </div>
+</div>
+
+<!-- APPS SCRIPT MODAL -->
+
+<div class="modal-overlay" id="script-modal" style="display:none !important;" onclick="closeOnOverlay(event,'script-modal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3>Apps Script Code</h3>
+    <p style="color:#8a978a !important;font-size:13px !important;margin-bottom:14px !important;">Copy all of this code, paste it into your Apps Script editor replacing everything there, save, then deploy as a Web App.</p>
+    <textarea class="code-area" id="script-code-area" readonly></textarea>
+    <div class="modal-actions">
+      <button class="btn btn-primary btn-md" style="flex:1 !important;" onclick="copyScript()">Copy Code</button>
+      <button class="btn btn-secondary btn-md" onclick="closeModal('script-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================
+     MAIN APP
+     ================================================ -->
+
+<div id="app">
+  <header class="app-header">
+    <div class="app-logo font-display">Ledger</div>
+    <div class="header-right">
+      <div class="sync-status">
+        <div class="sync-dot" id="sync-dot"></div>
+        <span id="sync-label">Synced</span>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="syncAll()">↻</button>
+    </div>
+  </header>
+
+  <main class="main-content" id="main-content"></main>
+
+  <!-- BOTTOM NAV -->
+
+  <nav class="bottom-nav">
+    <div class="nav-tab active" id="nav-dashboard" onclick="showPage('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      <span>Home</span>
+    </div>
+    <div class="nav-tab" id="nav-expenses" onclick="showPage('expenses')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="5 12 12 19 19 12"/></svg>
+      <span>Expenses</span>
+    </div>
+    <div class="nav-tab" id="nav-budget" onclick="showPage('budget')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      <span>Budget</span>
+    </div>
+    <div class="nav-tab" id="nav-credit" onclick="showPage('credit')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      <span>Cards</span>
+    </div>
+    <div class="nav-tab" id="nav-more" onclick="toggleMore()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>
+      <span>More</span>
+    </div>
+  </nav>
+
+  <!-- MORE MENU -->
+
+  <div class="more-menu" id="more-menu">
+    <div class="more-item" id="nav-income" onclick="showPage('income');toggleMore()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px !important;height:18px !important;"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+      Income
+    </div>
+    <div class="more-item" id="nav-loans" onclick="showPage('loans');toggleMore()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px !important;height:18px !important;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      Student Loans
+    </div>
+    <div class="more-item" id="nav-savings" onclick="showPage('savings');toggleMore()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px !important;height:18px !important;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      Savings Goals
+    </div>
+    <div class="more-item" onclick="disconnectSheet();toggleMore()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px !important;height:18px !important;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Disconnect Sheet
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+
+<div class="toast" id="toast"></div>
+
+<!-- ================================================
+     MODALS
+     ================================================ -->
+
+<!-- ADD TRANSACTION -->
+
+<div class="modal-overlay" id="txn-modal" style="display:none !important;" onclick="closeOnOverlay(event,'txn-modal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3 id="txn-modal-title">Add Transaction</h3>
+    <div class="input-group"><label>Date</label><input type="date" id="txn-date" /></div>
+    <div class="input-group"><label>Description</label><input type="text" id="txn-desc" placeholder="e.g. Grocery run" /></div>
+    <div class="form-row">
+      <div class="input-group"><label>Amount ($)</label><input type="number" id="txn-amount" placeholder="0.00" step="0.01" min="0" inputmode="decimal" /></div>
+      <div class="input-group"><label>Type</label>
+        <select id="txn-type" onchange="onTxnTypeChange()">
+          <option value="expense">Expense</option>
+          <option value="income">Income</option>
+        </select>
+      </div>
+    </div>
+    <div class="input-group"><label>Category</label><select id="txn-category"></select></div>
+    <div class="input-group" id="txn-card-group"><label>Credit Card (if applicable)</label>
+      <select id="txn-card"><option value="">— Cash / Debit —</option></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary btn-md" style="flex:1 !important;" onclick="saveTransaction()">Save</button>
+      <button class="btn btn-secondary btn-md" onclick="closeModal('txn-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD BUDGET CATEGORY -->
+
+<div class="modal-overlay" id="budget-modal" style="display:none !important;" onclick="closeOnOverlay(event,'budget-modal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3>Add Budget Category</h3>
+    <div class="input-group"><label>Category Name</label><input type="text" id="bc-name" placeholder="e.g. Groceries" /></div>
+    <div class="form-row">
+      <div class="input-group"><label>Monthly Budget ($)</label><input type="number" id="bc-amount" placeholder="0.00" step="0.01" min="0" inputmode="decimal" /></div>
+      <div class="input-group"><label>Color</label>
+        <select id="bc-color">
+          <option value="#a8e063">Green</option>
+          <option value="#60a8f0">Blue</option>
+          <option value="#f0b060">Orange</option>
+          <option value="#b060f0">Purple</option>
+          <option value="#f06060">Red</option>
+          <option value="#5be39a">Teal</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary btn-md" style="flex:1 !important;" onclick="saveBudgetCategory()">Save</button>
+      <button class="btn btn-secondary btn-md" onclick="closeModal('budget-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD CREDIT CARD -->
+
+<div class="modal-overlay" id="cc-modal" style="display:none !important;" onclick="closeOnOverlay(event,'cc-modal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3>Add Credit Card</h3>
+    <div class="form-row">
+      <div class="input-group"><label>Card Nickname</label><input type="text" id="cc-name" placeholder="e.g. Chase Sapphire" /></div>
+      <div class="input-group"><label>Network</label>
+        <select id="cc-network"><option>Visa</option><option>Mastercard</option><option>Amex</option><option>Discover</option><option>Other</option></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="input-group"><label>Current Balance ($)</label><input type="number" id="cc-balance" placeholder="0.00" step="0.01" min="0" inputmode="decimal" /></div>
+      <div class="input-group"><label>Credit Limit ($)</label><input type="number" id="cc-limit" placeholder="0.00" step="0.01" min="0" inputmode="decimal" /></div>
+    </div>
+    <div class="form-row">
+      <div class="input-group"><label>APR (%)</label><input type="number" id="cc-apr" placeholder="0.00" step="0.01" min="0" inputmode="decimal" /></div>
+      <div class="input-group"><label>Min Payment ($)</label><input type="number" id="cc-minpay" placeholder="0.00" step="0.01" min="0" inputmode="decimal" /></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary btn-md" style="flex:1 !important;" onclick="saveCreditCard()">Save</button>
+      <button class="btn btn-secondary btn-md" onclick="closeModal('cc-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOG CARD PAYMENT -->
+
+<div class="modal-overlay" id="ccpay-modal" style="display:none !important;" onclick="closeOnOverlay(event,'ccpay-modal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3>Log Card Payment</h3>
+    <div class="input-group"><label>Card</label><select id="ccpay-card"></select></div>
+    <div class="form-row">
+      <div class="input-group"><label>Payment Amount ($)</label><input type="number" id="ccpay-amount" placeholder="0.00" step="0.01" min="0" inputmode="decimal" /></div>
+      <div class="input-group"><label>Date</label><input type="date" id="ccpay-date" /></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary btn-md" style="flex:1 !important;" onclick="saveCCPayment()">Save</button>
+      <button class="btn btn-secondary btn-md" onclick="closeModal('ccpay-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD STUDENT LOAN -->
+
+<div class="modal-overlay" id="loan-modal" style="display:none !important;" onclick="closeOnOverlay(event,'loan-modal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3>Add Student Loan</h3>
+    <div class="form-row">
+      <div class="input-group"><label>Loan Name</label><input type="text" id="ln-name" placeholder="e.g. Federal Sub." /></div>
+      <div class="input-group"><label>Servicer</label><input type="text" id="ln-servicer" placeholder="e.g. MOHELA" /></div>
+    </div>
+    <div class="form-row">
+      <div class="input-group"><label>Original Balance ($)</label><input type="number" id="ln-original" placeholder="0.00" step="0.01" inputmode="decimal" /></div>
+      <div class="input-group"><label>Current Balance ($)</label><input type="number" id="ln-balance" placeholder="0.00" step="0.01" inputmode="decimal" /></div>
+    </div>
+    <div class="form-row">
+      <div class="input-group"><label>Interest Rate (%)</label><input type="number" id="ln-rate" placeholder="0.00" step="0.01" inputmode="decimal" /></div>
+      <div class="input-group"><label>Monthly Payment ($)</label><input type="number" id="ln-payment" placeholder="0.00" step="0.01" inputmode="decimal" /></div>
+    </div>
+    <div class="input-group"><label>Loan Type</label>
+      <select id="ln-type"><option>Federal Subsidized</option><option>Federal Unsubsidized</option><option>Federal PLUS</option><option>Private</option><option>Refinanced</option></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary btn-md" style="flex:1 !important;" onclick="saveStudentLoan()">Save</button>
+      <button class="btn btn-secondary btn-md" onclick="closeModal('loan-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOG LOAN PAYMENT -->
+
+<div class="modal-overlay" id="loanpay-modal" style="display:none !important;" onclick="closeOnOverlay(event,'loanpay-modal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3>Log Loan Payment</h3>
+    <div class="input-group"><label>Loan</label><select id="loanpay-loan"></select></div>
+    <div class="form-row">
+      <div class="input-group"><label>Total Payment ($)</label><input type="number" id="loanpay-amount" placeholder="0.00" step="0.01" inputmode="decimal" /></div>
+      <div class="input-group"><label>Date</label><input type="date" id="loanpay-date" /></div>
+    </div>
+    <div class="form-row">
+      <div class="input-group"><label>Principal Portion ($)</label><input type="number" id="loanpay-principal" placeholder="0.00" step="0.01" inputmode="decimal" /></div>
+      <div class="input-group"><label>Interest Portion ($)</label><input type="number" id="loanpay-interest" placeholder="0.00" step="0.01" inputmode="decimal" /></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary btn-md" style="flex:1 !important;" onclick="saveLoanPayment()">Save</button>
+      <button class="btn btn-secondary btn-md" onclick="closeModal('loanpay-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD SAVINGS GOAL -->
+
+<div class="modal-overlay" id="goal-modal" style="display:none !important;" onclick="closeOnOverlay(event,'goal-modal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3>Add Savings Goal</h3>
+    <div class="input-group"><label>Goal Name</label><input type="text" id="g-name" placeholder="e.g. Emergency Fund" /></div>
+    <div class="form-row">
+      <div class="input-group"><label>Target Amount ($)</label><input type="number" id="g-target" placeholder="0.00" step="0.01" inputmode="decimal" /></div>
+      <div class="input-group"><label>Already Saved ($)</label><input type="number" id="g-current" placeholder="0.00" step="0.01" inputmode="decimal" /></div>
+    </div>
+    <div class="form-row">
+      <div class="input-group"><label>Target Date</label><input type="date" id="g-date" /></div>
+      <div class="input-group"><label>Monthly Contribution ($)</label><input type="number" id="g-monthly" placeholder="0.00" step="0.01" inputmode="decimal" /></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary btn-md" style="flex:1 !important;" onclick="saveSavingsGoal()">Save</button>
+      <button class="btn btn-secondary btn-md" onclick="closeModal('goal-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD GOAL CONTRIBUTION -->
+
+<div class="modal-overlay" id="gc-modal" style="display:none !important;" onclick="closeOnOverlay(event,'gc-modal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3>Add Contribution</h3>
+    <div class="input-group"><label>Goal</label><select id="gc-goal"></select></div>
+    <div class="form-row">
+      <div class="input-group"><label>Amount ($)</label><input type="number" id="gc-amount" placeholder="0.00" step="0.01" inputmode="decimal" /></div>
+      <div class="input-group"><label>Date</label><input type="date" id="gc-date" /></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary btn-md" style="flex:1 !important;" onclick="saveGoalContrib()">Save</button>
+      <button class="btn btn-secondary btn-md" onclick="closeModal('gc-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// APPS SCRIPT BACKEND CODE (displayed to user for copy/paste)
+// ============================================================
+const APPS_SCRIPT_SOURCE = `function doPost(e) {
+  try {
+    var data = JSON.parse(e.postData.contents);
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var result = {};
+    if (data.action === 'ping') {
+      result = { ok: true, name: ss.getName() };
+    } else if (data.action === 'read') {
+      result = readAll(ss);
+    } else if (data.action === 'appendRow') {
+      appendRow(ss, data.sheet, data.row);
+      result = { ok: true };
+    } else if (data.action === 'deleteRow') {
+      deleteRow(ss, data.sheet, data.rowIndex);
+      result = { ok: true };
+    } else if (data.action === 'write') {
+      writeSheet(ss, data.sheet, data.rows);
+      result = { ok: true };
+    }
+    return ContentService.createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({ error: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e) {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    return ContentService.createTextOutput(JSON.stringify(readAll(ss)))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({ error: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+var SHEETS = ['Transactions','BudgetCategories','CreditCards','CCPayments','StudentLoans','LoanPayments','SavingsGoals','GoalContributions'];
+
+function ensureSheets(ss) {
+  SHEETS.forEach(function(name) {
+    if (!ss.getSheetByName(name)) ss.insertSheet(name);
+  });
+}
+
+function readAll(ss) {
+  ensureSheets(ss);
+  var out = {};
+  SHEETS.forEach(function(name) {
+    var sh = ss.getSheetByName(name);
+    var vals = sh.getDataRange().getValues();
+    out[name] = vals.length > 1 ? vals.slice(1) : [];
+  });
+  return out;
+}
+
+function appendRow(ss, sheetName, row) {
+  var sh = ss.getSheetByName(sheetName);
+  if (!sh) sh = ss.insertSheet(sheetName);
+  sh.appendRow(row);
+}
+
+function deleteRow(ss, sheetName, rowIndex) {
+  var sh = ss.getSheetByName(sheetName);
+  if (sh && rowIndex >= 0) sh.deleteRow(rowIndex + 2);
+}
+
+function writeSheet(ss, sheetName, rows) {
+  var sh = ss.getSheetByName(sheetName);
+  if (!sh) sh = ss.insertSheet(sheetName);
+  sh.clearContents();
+  if (rows && rows.length > 0) sh.getRange(1, 1, rows.length, rows[0].length).setValues(rows);
+}`;
+
+// ============================================================
+// STATE
+// ============================================================
+let SHEET_URL = '';
+let currentPage = 'dashboard';
+let currentMonth = new Date().getMonth();
+let currentYear  = new Date().getFullYear();
+let moreOpen = false;
+
+let db = {
+  Transactions: [], BudgetCategories: [],
+  CreditCards: [],  CCPayments: [],
+  StudentLoans: [],  LoanPayments: [],
+  SavingsGoals: [],  GoalContributions: []
+};
+
+// ============================================================
+// SETUP / CONNECTION
+// ============================================================
+function showScriptModal() {
+  document.getElementById('script-code-area').value = APPS_SCRIPT_SOURCE;
+  openModal('script-modal');
+}
+
+function copyScript() {
+  navigator.clipboard.writeText(APPS_SCRIPT_SOURCE)
+    .then(() => toast('Code copied!'))
+    .catch(() => {
+      document.getElementById('script-code-area').select();
+      document.execCommand('copy');
+      toast('Code copied!');
+    });
+}
+
+async function connectSheet() {
+  const url = document.getElementById('sheet-url').value.trim();
+  if (!url) { toast('Please enter your Apps Script URL'); return; }
+  const btn = document.getElementById('connect-btn-text');
+  btn.innerHTML = '<span class="spinner"></span>&nbsp;Connecting…';
+  try {
+    const res = await api({ action: 'ping' }, url);
+    if (res.ok) {
+      SHEET_URL = url;
+      localStorage.setItem('ledger_url', url);
+      await loadAll();
+      document.getElementById('setup-overlay').style.setProperty('display', 'none', 'important');
+      document.getElementById('app').style.setProperty('display', 'block', 'important');
+      showPage('dashboard');
+      toast('Connected to: ' + (res.name || 'Google Sheet'));
+    } else {
+      toast('Connection failed — check the URL and try again.');
+    }
+  } catch(e) {
+    toast('Error: ' + e.message);
+  }
+  btn.textContent = 'Connect to Google Sheets';
+}
+
+function disconnectSheet() {
+  localStorage.removeItem('ledger_url');
+  SHEET_URL = '';
+  document.getElementById('app').style.setProperty('display', 'none', 'important');
+  document.getElementById('setup-overlay').style.setProperty('display', 'flex', 'important');
+}
+
+// ============================================================
+// API LAYER
+// ============================================================
+async function api(body, url = SHEET_URL) {
+  const r = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  return r.json();
+}
+
+async function loadAll() {
+  setSyncStatus('syncing');
+  try {
+    const d = await api({ action: 'read' });
+    db.Transactions      = (d.Transactions      || []).map(parseTxn);
+    db.BudgetCategories  = (d.BudgetCategories  || []).map(parseCat);
+    db.CreditCards       = (d.CreditCards       || []).map(parseCC);
+    db.CCPayments        = (d.CCPayments        || []).map(parseCCPay);
+    db.StudentLoans      = (d.StudentLoans      || []).map(parseLoan);
+    db.LoanPayments      = (d.LoanPayments      || []).map(parseLoanPay);
+    db.SavingsGoals      = (d.SavingsGoals      || []).map(parseGoal);
+    db.GoalContributions = (d.GoalContributions || []).map(parseGC);
+    setSyncStatus('synced');
+  } catch(e) {
+    setSyncStatus('error');
+    toast('Sync error: ' + e.message);
+  }
+}
+
+async function syncAll() {
+  await loadAll();
+  renderPage();
+  toast('Synced!');
+}
+
+function setSyncStatus(s) {
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-label');
+  const colors = { syncing: '#f0b060', synced: '#5be39a', error: '#f06060' };
+  const labels = { syncing: 'Syncing…', synced: 'Synced', error: 'Error' };
+  if (dot) dot.style.setProperty('background-color', colors[s], 'important');
+  if (lbl) lbl.textContent = labels[s];
+}
+
+// ============================================================
+// PARSERS
+// ============================================================
+const parseTxn    = r => ({ id:r[0], date:r[1], desc:r[2], amount:+r[3], type:r[4], category:r[5]||'', cardId:r[6]||'' });
+const parseCat    = r => ({ id:r[0], name:r[1], budget:+r[2], color:r[3]||'#a8e063', rollover:+(r[4]||0) });
+const parseCC     = r => ({ id:r[0], name:r[1], network:r[2], balance:+r[3], limit:+r[4], apr:+r[5], minPayment:+r[6] });
+const parseCCPay  = r => ({ id:r[0], cardId:r[1], amount:+r[2], date:r[3] });
+const parseLoan   = r => ({ id:r[0], name:r[1], servicer:r[2], originalBalance:+r[3], balance:+r[4], rate:+r[5], monthlyPayment:+r[6], type:r[7] });
+const parseLoanPay= r => ({ id:r[0], loanId:r[1], amount:+r[2], date:r[3], principal:+(r[4]||0), interest:+(r[5]||0) });
+const parseGoal   = r => ({ id:r[0], name:r[1], target:+r[2], current:+r[3], targetDate:r[4]||'', monthly:+r[5] });
+const parseGC     = r => ({ id:r[0], goalId:r[1], amount:+r[2], date:r[3] });
+
+// ============================================================
+// HELPERS
+// ============================================================
+const uid    = () => Date.now().toString(36) + Math.random().toString(36).substr(2,5);
+const fmt    = n  => '$' + Math.abs(+n||0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+const today  = () => new Date().toISOString().split('T')[0];
+const monthStr = () => new Date(currentYear, currentMonth).toLocaleString('en-US',{month:'long',year:'numeric'});
+
+function fmtDate(d) {
+  if (!d) return '—';
+  const dt = new Date(d + 'T12:00:00');
+  return dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit'});
+}
+
+function inMonth(dateStr) {
+  if (!dateStr) return false;
+  const d = new Date(dateStr + 'T12:00:00');
+  return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+}
+
+const monthTxns = () => db.Transactions.filter(t => inMonth(t.date));
+const catColor  = name => { const c = db.BudgetCategories.find(c => c.name === name); return c ? c.color : '#5a675a'; };
+
+function goalTotal(g) {
+  return g.current + db.GoalContributions.filter(c => c.goalId === g.id).reduce((s,c) => s+c.amount, 0);
+}
+
+// ============================================================
+// MODAL HELPERS
+// ============================================================
+function openModal(id) { document.getElementById(id).style.setProperty('display','flex','important'); }
+function closeModal(id) { document.getElementById(id).style.setProperty('display','none','important'); }
+function closeOnOverlay(e, id) { if (e.target === e.currentTarget) closeModal(id); }
+
+function toggleMore() {
+  moreOpen = !moreOpen;
+  const m = document.getElementById('more-menu');
+  const t = document.getElementById('nav-more');
+  m.classList.toggle('open', moreOpen);
+  t.classList.toggle('active', moreOpen);
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showPage(page) {
+  currentPage = page;
+  ['dashboard','expenses','budget','credit','income','loans','savings'].forEach(p => {
+    const el = document.getElementById('nav-' + p);
+    if (el) el.classList.toggle('active', p === page);
+  });
+  renderPage();
+}
+
+function renderPage() {
+  const pages = { dashboard, income, expenses, budget, credit, loans, savings };
+  if (pages[currentPage]) pages[currentPage]();
+}
+
+function prevMonth() { if (currentMonth===0){currentMonth=11;currentYear--;}else currentMonth--; renderPage(); }
+function nextMonth() { if (currentMonth===11){currentMonth=0;currentYear++;}else currentMonth++; renderPage(); }
+
+// ============================================================
+// PAGE: DASHBOARD
+// ============================================================
+function dashboard() {
+  const txns = monthTxns();
+  const totalIncome   = txns.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const totalExpenses = txns.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const net = totalIncome - totalExpenses;
+  const totalLoanDebt = db.StudentLoans.reduce((s,l)=>s+l.balance,0);
+  const totalCCDebt   = db.CreditCards.reduce((s,c)=>s+c.balance,0);
+
+  const catTotals = {};
+  txns.filter(t=>t.type==='expense').forEach(t => {
+    const k = t.category||'Uncategorized';
+    catTotals[k] = (catTotals[k]||0) + t.amount;
+  });
+  const topCats = Object.entries(catTotals).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const recent = [...db.Transactions].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,6);
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="month-nav">
+      <div class="month-btn" onclick="prevMonth()">&#8592;</div>
+      <h2>${monthStr()}</h2>
+      <div class="month-btn" onclick="nextMonth()">&#8594;</div>
+    </div>
+
+    <div class="summary-grid summary-grid-4">
+      <div class="summary-card">
+        <div class="s-label">Income</div>
+        <div class="s-amount col-green mono">${fmt(totalIncome)}</div>
+        <div class="s-sub">this month</div>
+      </div>
+      <div class="summary-card">
+        <div class="s-label">Expenses</div>
+        <div class="s-amount col-red mono">${fmt(totalExpenses)}</div>
+        <div class="s-sub">this month</div>
+      </div>
+      <div class="summary-card">
+        <div class="s-label">Net Flow</div>
+        <div class="s-amount ${net>=0?'col-green':'col-red'} mono">${net>=0?'+':''}${fmt(Math.abs(net))}</div>
+        <div class="s-sub">${net>=0?'surplus':'deficit'}</div>
+      </div>
+      <div class="summary-card">
+        <div class="s-label">Total Debt</div>
+        <div class="s-amount col-red mono">${fmt(totalLoanDebt+totalCCDebt)}</div>
+        <div class="s-sub">loans + cards</div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-md btn-full" style="margin-bottom:16px !important;" onclick="openTxnModal()">+ Add Transaction</button>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Top Spending</div>
+        <span class="col-dim" style="font-size:11px !important;">${monthStr()}</span>
+      </div>
+      ${topCats.length ? topCats.map(([cat,amt]) => {
+        const bc = db.BudgetCategories.find(c=>c.name===cat);
+        const budAmt = bc ? bc.budget + (bc.rollover||0) : 0;
+        const pct = budAmt ? Math.min(amt/budAmt*100,100) : 0;
+        const fillColor = pct>=100?'#f06060':pct>=80?'#f0b060': (bc ? bc.color : '#a8e063');
+        return `<div class="budget-row">
+          <div class="budget-row-header">
+            <span class="budget-row-label">${cat}</span>
+            <span class="budget-row-amounts">${fmt(amt)}${budAmt?' / '+fmt(budAmt):''}</span>
+          </div>
+          ${budAmt?`<div class="progress-bar"><div class="progress-fill" style="width:${pct}% !important;background-color:${fillColor} !important;"></div></div>`:''}
+        </div>`;
+      }).join('') : '<div class="empty-state">No expenses this month</div>'}
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Recent Transactions</div>
+        <button class="btn btn-ghost btn-sm" onclick="showPage('expenses')">All</button>
+      </div>
+      ${recent.length ? `<div class="table-wrap"><table class="data-table">
+        <thead><tr><th>Date</th><th>Description</th><th class="text-right">Amount</th></tr></thead>
+        <tbody>${recent.map(t=>`
+          <tr>
+            <td class="mono col-dim" style="font-size:11px !important;white-space:nowrap !important;">${fmtDate(t.date)}</td>
+            <td style="max-width:130px !important;overflow:hidden !important;text-overflow:ellipsis !important;white-space:nowrap !important;">${t.desc}</td>
+            <td class="mono text-right ${t.type==='income'?'col-green':'col-red'}" style="white-space:nowrap !important;">${t.type==='income'?'+':'-'}${fmt(t.amount)}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table></div>` : '<div class="empty-state">No transactions yet</div>'}
+    </div>
+
+    ${db.SavingsGoals.length ? `<div class="card">
+      <div class="card-header">
+        <div class="card-title">Savings Goals</div>
+        <button class="btn btn-ghost btn-sm" onclick="showPage('savings')">All</button>
+      </div>
+      ${db.SavingsGoals.slice(0,3).map(g => {
+        const total = goalTotal(g);
+        const pct = Math.min(total/g.target*100,100);
+        return `<div class="budget-row">
+          <div class="budget-row-header">
+            <span class="budget-row-label">${g.name}</span>
+            <span class="budget-row-amounts">${fmt(total)} / ${fmt(g.target)}</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${pct}% !important;background-color:#5be39a !important;"></div></div>
+        </div>`;
+      }).join('')}
+    </div>` : ''}
+  `;
+}
+
+// ============================================================
+// PAGE: INCOME
+// ============================================================
+function income() {
+  const all = db.Transactions.filter(t=>t.type==='income').sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const mon = all.filter(t=>inMonth(t.date));
+  const total = mon.reduce((s,t)=>s+t.amount,0);
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="month-nav">
+      <div class="month-btn" onclick="prevMonth()">&#8592;</div>
+      <h2>Income — ${monthStr()}</h2>
+      <div class="month-btn" onclick="nextMonth()">&#8594;</div>
+    </div>
+    <div class="summary-grid">
+      <div class="summary-card"><div class="s-label">This Month</div><div class="s-amount col-green mono">${fmt(total)}</div></div>
+      <div class="summary-card"><div class="s-label">Transactions</div><div class="s-amount mono">${mon.length}</div></div>
+    </div>
+    <button class="btn btn-primary btn-md btn-full" style="margin-bottom:16px !important;" onclick="openTxnModal('income')">+ Add Income</button>
+    <div class="card">
+      <div class="card-title" style="margin-bottom:12px !important;">All Income</div>
+      ${all.length ? `<div class="table-wrap"><table class="data-table">
+        <thead><tr><th>Date</th><th>Description</th><th>Source</th><th class="text-right">Amount</th><th></th></tr></thead>
+        <tbody>${all.map(t=>`
+          <tr>
+            <td class="mono col-dim" style="font-size:11px !important;white-space:nowrap !important;">${fmtDate(t.date)}</td>
+            <td>${t.desc}</td>
+            <td><span class="badge badge-green">${t.category||'—'}</span></td>
+            <td class="mono text-right col-green" style="white-space:nowrap !important;">+${fmt(t.amount)}</td>
+            <td><button class="delete-btn" onclick="deleteTxn('${t.id}')">✕</button></td>
+          </tr>`).join('')}
+        </tbody>
+      </table></div>` : '<div class="empty-state">No income recorded yet</div>'}
+    </div>
+  `;
+}
+
+// ============================================================
+// PAGE: EXPENSES
+// ============================================================
+function expenses() {
+  const all = db.Transactions.filter(t=>t.type==='expense').sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const mon = all.filter(t=>inMonth(t.date));
+  const total = mon.reduce((s,t)=>s+t.amount,0);
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="month-nav">
+      <div class="month-btn" onclick="prevMonth()">&#8592;</div>
+      <h2>Expenses — ${monthStr()}</h2>
+      <div class="month-btn" onclick="nextMonth()">&#8594;</div>
+    </div>
+    <div class="summary-grid">
+      <div class="summary-card"><div class="s-label">This Month</div><div class="s-amount col-red mono">${fmt(total)}</div></div>
+      <div class="summary-card"><div class="s-label">Transactions</div><div class="s-amount mono">${mon.length}</div></div>
+    </div>
+    <button class="btn btn-primary btn-md btn-full" style="margin-bottom:16px !important;" onclick="openTxnModal('expense')">+ Add Expense</button>
+    <div class="card">
+      <div class="card-title" style="margin-bottom:12px !important;">All Expenses</div>
+      ${all.length ? `<div class="table-wrap"><table class="data-table">
+        <thead><tr><th>Date</th><th>Description</th><th>Cat.</th><th>Card</th><th class="text-right">Amt</th><th></th></tr></thead>
+        <tbody>${all.map(t => {
+          const card = db.CreditCards.find(c=>c.id===t.cardId);
+          return `<tr>
+            <td class="mono col-dim" style="font-size:11px !important;white-space:nowrap !important;">${fmtDate(t.date)}</td>
+            <td style="max-width:100px !important;overflow:hidden !important;text-overflow:ellipsis !important;white-space:nowrap !important;">${t.desc}</td>
+            <td style="white-space:nowrap !important;"><span class="badge badge-green" style="background-color:rgba(168,224,99,0.12) !important;color:${catColor(t.category)} !important;">${t.category||'—'}</span></td>
+            <td class="col-dim" style="font-size:11px !important;white-space:nowrap !important;">${card?card.name:'—'}</td>
+            <td class="mono text-right col-red" style="white-space:nowrap !important;">-${fmt(t.amount)}</td>
+            <td><button class="delete-btn" onclick="deleteTxn('${t.id}')">✕</button></td>
+          </tr>`;
+        }).join('')}
+        </tbody>
+      </table></div>` : '<div class="empty-state">No expenses recorded yet</div>'}
+    </div>
+  `;
+}
+
+// ============================================================
+// PAGE: BUDGET
+// ============================================================
+function budget() {
+  const txns = monthTxns().filter(t=>t.type==='expense');
+  const catTotals = {};
+  txns.forEach(t => { const k = t.category||'Uncategorized'; catTotals[k]=(catTotals[k]||0)+t.amount; });
+  const totalSpent = Object.values(catTotals).reduce((s,v)=>s+v,0);
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="month-nav">
+      <div class="month-btn" onclick="prevMonth()">&#8592;</div>
+      <h2>Budget — ${monthStr()}</h2>
+      <div class="month-btn" onclick="nextMonth()">&#8594;</div>
+    </div>
+    <button class="btn btn-primary btn-md btn-full" style="margin-bottom:16px !important;" onclick="openModal('budget-modal')">+ Add Category</button>
+
+    <div class="card">
+      <div class="card-title" style="margin-bottom:14px !important;">Budget Categories</div>
+      ${db.BudgetCategories.length ? db.BudgetCategories.map(cat => {
+        const spent = catTotals[cat.name]||0;
+        const cap   = cat.budget + (cat.rollover||0);
+        const avail = cap - spent;
+        const pct   = cap ? Math.min(spent/cap*100,100) : 0;
+        const fill  = pct>=100?'#f06060':pct>=80?'#f0b060':cat.color;
+        return `<div class="cat-block">
+          <div class="budget-row-header">
+            <span class="budget-row-label">
+              <span style="display:inline-block !important;width:8px !important;height:8px !important;border-radius:50% !important;background-color:${cat.color} !important;margin-right:6px !important;"></span>
+              ${cat.name}
+            </span>
+            <div class="flex items-center gap-8">
+              ${cat.rollover?`<span class="badge badge-blue" style="font-size:10px !important;">+${fmt(cat.rollover)} rollover</span>`:''}
+              <button class="delete-btn" onclick="deleteCat('${cat.id}')">✕</button>
+            </div>
+          </div>
+          <div style="display:flex !important;justify-content:space-between !important;margin:4px 0 !important;">
+            <span class="mono" style="font-size:12px !important;color:#e8ede8 !important;">${fmt(spent)} <span style="color:#5a675a !important;">/ ${fmt(cap)}</span></span>
+            <span class="mono" style="font-size:12px !important;color:${avail<0?'#f06060':'#8a978a'} !important;">${avail>=0?fmt(avail)+' left':fmt(Math.abs(avail))+' over'}</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:${pct}% !important;background-color:${fill} !important;"></div>
+          </div>
+        </div>`;
+      }).join('') : '<div class="empty-state">No categories yet. Add your first budget category!</div>'}
+    </div>
+
+    ${Object.keys(catTotals).length ? `<div class="card">
+      <div class="card-title" style="margin-bottom:14px !important;">Spending Breakdown</div>
+      ${Object.entries(catTotals).sort((a,b)=>b[1]-a[1]).map(([cat,amt]) => {
+        const pct = totalSpent ? amt/totalSpent*100 : 0;
+        return `<div class="budget-row">
+          <div class="budget-row-header">
+            <span class="budget-row-label">${cat}</span>
+            <span class="budget-row-amounts">${fmt(amt)} · ${pct.toFixed(1)}%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:${pct}% !important;background-color:${catColor(cat)} !important;"></div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>` : ''}
+  `;
+}
+
+// ============================================================
+// PAGE: CREDIT CARDS
+// ============================================================
+function credit() {
+  const totalBal  = db.CreditCards.reduce((s,c)=>s+c.balance,0);
+  const totalLim  = db.CreditCards.reduce((s,c)=>s+c.limit,0);
+  const util      = totalLim ? totalBal/totalLim*100 : 0;
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="page-header">
+      <div class="page-title font-display">Credit Cards</div>
+      <div class="page-actions">
+        <button class="btn btn-ghost btn-sm" onclick="openCCPayModal()">Log Payment</button>
+        <button class="btn btn-primary btn-sm" onclick="openModal('cc-modal')">+ Add Card</button>
+      </div>
+    </div>
+    <div class="summary-grid summary-grid-4">
+      <div class="summary-card"><div class="s-label">Total Balance</div><div class="s-amount col-red mono">${fmt(totalBal)}</div></div>
+      <div class="summary-card"><div class="s-label">Total Limit</div><div class="s-amount col-blue mono">${fmt(totalLim)}</div></div>
+      <div class="summary-card"><div class="s-label">Utilization</div><div class="s-amount ${util>30?'col-red':'col-green'} mono">${util.toFixed(1)}%</div><div class="s-sub">${util>30?'↑ above 30%':'✓ good'}</div></div>
+      <div class="summary-card"><div class="s-label">Cards</div><div class="s-amount mono">${db.CreditCards.length}</div></div>
+    </div>
+
+    ${db.CreditCards.length ? db.CreditCards.map(c => {
+      const pays     = db.CCPayments.filter(p=>p.cardId===c.id);
+      const totalPaid = pays.reduce((s,p)=>s+p.amount,0);
+      const monthSpend = db.Transactions.filter(t=>t.type==='expense'&&t.cardId===c.id&&inMonth(t.date)).reduce((s,t)=>s+t.amount,0);
+      const pct = c.limit ? Math.min(c.balance/c.limit*100,100) : 0;
+      const fill = pct>=80?'#f06060':pct>=50?'#f0b060':'#60a8f0';
+      return `<div class="cc-card">
+        <div class="cc-top">
+          <div>
+            <div class="cc-name">${c.name}</div>
+            <div class="cc-network">${c.network}</div>
+          </div>
+          <button class="delete-btn" onclick="deleteCC('${c.id}')">✕</button>
+        </div>
+        <div class="cc-balance">${fmt(c.balance)}</div>
+        <div style="font-size:11px !important;color:#5a675a !important;margin-bottom:8px !important;">of ${fmt(c.limit)} limit · ${pct.toFixed(0)}% used</div>
+        ${c.limit?`<div class="progress-bar" style="height:8px !important;margin-bottom:12px !important;"><div class="progress-fill" style="width:${pct}% !important;background-color:${fill} !important;"></div></div>`:''}
+        <div class="cc-stats">
+          <div class="cc-stat"><label>APR</label><span>${c.apr}%</span></div>
+          <div class="cc-stat"><label>Min Pay</label><span>${fmt(c.minPayment)}</span></div>
+          <div class="cc-stat"><label>This Month</label><span style="color:#f06060 !important;">${fmt(monthSpend)}</span></div>
+          <div class="cc-stat"><label>Total Paid</label><span style="color:#a8e063 !important;">${fmt(totalPaid)}</span></div>
+          <div class="cc-stat"><label>Payments</label><span>${pays.length}</span></div>
+          <div class="cc-stat"><label>Available</label><span style="color:#5be39a !important;">${fmt(Math.max(0,c.limit-c.balance))}</span></div>
+        </div>
+      </div>`;
+    }).join('') : '<div class="empty-state">No credit cards added yet.</div>'}
+
+    ${db.CCPayments.length ? `<div class="card">
+      <div class="card-title" style="margin-bottom:12px !important;">Payment History</div>
+      <div class="table-wrap"><table class="data-table">
+        <thead><tr><th>Date</th><th>Card</th><th class="text-right">Amount</th><th></th></tr></thead>
+        <tbody>${[...db.CCPayments].sort((a,b)=>new Date(b.date)-new Date(a.date)).map(p=>{
+          const card=db.CreditCards.find(c=>c.id===p.cardId);
+          return `<tr>
+            <td class="mono col-dim" style="font-size:11px !important;">${fmtDate(p.date)}</td>
+            <td>${card?card.name:'—'}</td>
+            <td class="mono text-right col-green">+${fmt(p.amount)}</td>
+            <td><button class="delete-btn" onclick="deleteCCPay('${p.id}')">✕</button></td>
+          </tr>`;
+        }).join('')}
+        </tbody>
+      </table></div>
+    </div>` : ''}
+  `;
+}
+
+// ============================================================
+// PAGE: STUDENT LOANS
+// ============================================================
+function loans() {
+  const totalBal  = db.StudentLoans.reduce((s,l)=>s+l.balance,0);
+  const totalOrig = db.StudentLoans.reduce((s,l)=>s+l.originalBalance,0);
+  const totalPaid = totalOrig - totalBal;
+  const totalMo   = db.StudentLoans.reduce((s,l)=>s+l.monthlyPayment,0);
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="page-header">
+      <div class="page-title font-display">Student Loans</div>
+      <div class="page-actions">
+        <button class="btn btn-ghost btn-sm" onclick="openLoanPayModal()">Log Payment</button>
+        <button class="btn btn-primary btn-sm" onclick="openModal('loan-modal')">+ Add Loan</button>
+      </div>
+    </div>
+    <div class="summary-grid summary-grid-4">
+      <div class="summary-card"><div class="s-label">Remaining</div><div class="s-amount col-red mono">${fmt(totalBal)}</div></div>
+      <div class="summary-card"><div class="s-label">Paid Off</div><div class="s-amount col-green mono">${fmt(totalPaid)}</div></div>
+      <div class="summary-card"><div class="s-label">Monthly</div><div class="s-amount col-blue mono">${fmt(totalMo)}</div></div>
+      <div class="summary-card"><div class="s-label">Loans</div><div class="s-amount mono">${db.StudentLoans.length}</div></div>
+    </div>
+
+    ${totalOrig>0 ? `<div class="card">
+      <div class="card-header">
+        <div class="card-title">Overall Progress</div>
+        <span class="mono col-muted" style="font-size:12px !important;">${(totalPaid/totalOrig*100).toFixed(1)}% paid off</span>
+      </div>
+      <div class="progress-bar" style="height:10px !important;">
+        <div class="progress-fill" style="width:${Math.min(totalPaid/totalOrig*100,100)}% !important;background-color:#a8e063 !important;"></div>
+      </div>
+      <div style="display:flex !important;justify-content:space-between !important;margin-top:6px !important;font-size:11px !important;color:#5a675a !important;">
+        <span>${fmt(totalPaid)} paid</span><span>${fmt(totalOrig)} original</span>
+      </div>
+    </div>` : ''}
+
+    ${db.StudentLoans.length ? db.StudentLoans.map(l => {
+      const paidPct = l.originalBalance ? Math.min((l.originalBalance-l.balance)/l.originalBalance*100,100) : 0;
+      const pays = db.LoanPayments.filter(p=>p.loanId===l.id);
+      const tPaid = pays.reduce((s,p)=>s+p.amount,0);
+      const tInt  = pays.reduce((s,p)=>s+(p.interest||0),0);
+      return `<div class="loan-card">
+        <div class="loan-top">
+          <div>
+            <div class="loan-name">${l.name}</div>
+            <div class="loan-servicer">${l.servicer} · ${l.type}</div>
+          </div>
+          <button class="delete-btn" onclick="deleteLoan('${l.id}')">✕</button>
+        </div>
+        <div class="loan-balance">${fmt(l.balance)}</div>
+        <div style="font-size:11px !important;color:#5a675a !important;margin-bottom:8px !important;">remaining of ${fmt(l.originalBalance)}</div>
+        <div class="progress-bar" style="height:8px !important;margin-bottom:10px !important;">
+          <div class="progress-fill" style="width:${paidPct}% !important;background-color:#a8e063 !important;"></div>
+        </div>
+        <div class="loan-stats">
+          <div class="loan-stat"><label>Interest Rate</label><span>${l.rate}%</span></div>
+          <div class="loan-stat"><label>Monthly Pmt</label><span>${fmt(l.monthlyPayment)}</span></div>
+          <div class="loan-stat"><label>Total Paid</label><span style="color:#a8e063 !important;">${fmt(tPaid)}</span></div>
+          <div class="loan-stat"><label>Interest Paid</label><span style="color:#f0b060 !important;">${fmt(tInt)}</span></div>
+        </div>
+      </div>`;
+    }).join('') : '<div class="empty-state">No student loans added yet.</div>'}
+
+    ${db.LoanPayments.length ? `<div class="card">
+      <div class="card-title" style="margin-bottom:12px !important;">Payment History</div>
+      <div class="table-wrap"><table class="data-table">
+        <thead><tr><th>Date</th><th>Loan</th><th>Principal</th><th>Interest</th><th class="text-right">Total</th><th></th></tr></thead>
+        <tbody>${[...db.LoanPayments].sort((a,b)=>new Date(b.date)-new Date(a.date)).map(p=>{
+          const loan=db.StudentLoans.find(l=>l.id===p.loanId);
+          return `<tr>
+            <td class="mono col-dim" style="font-size:11px !important;white-space:nowrap !important;">${fmtDate(p.date)}</td>
+            <td style="max-width:90px !important;overflow:hidden !important;text-overflow:ellipsis !important;white-space:nowrap !important;font-size:12px !important;">${loan?loan.name:'—'}</td>
+            <td class="mono col-green" style="font-size:12px !important;">${p.principal?fmt(p.principal):'—'}</td>
+            <td class="mono col-yellow" style="font-size:12px !important;">${p.interest?fmt(p.interest):'—'}</td>
+            <td class="mono text-right col-green">${fmt(p.amount)}</td>
+            <td><button class="delete-btn" onclick="deleteLoanPay('${p.id}')">✕</button></td>
+          </tr>`;
+        }).join('')}
+        </tbody>
+      </table></div>
+    </div>` : ''}
+  `;
+}
+
+// ============================================================
+// PAGE: SAVINGS GOALS
+// ============================================================
+function savings() {
+  const totalSaved  = db.SavingsGoals.reduce((s,g)=>s+goalTotal(g),0);
+  const totalTarget = db.SavingsGoals.reduce((s,g)=>s+g.target,0);
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="page-header">
+      <div class="page-title font-display">Savings Goals</div>
+      <div class="page-actions">
+        <button class="btn btn-ghost btn-sm" onclick="openGCModal()">Add Contribution</button>
+        <button class="btn btn-primary btn-sm" onclick="openModal('goal-modal')">+ Add Goal</button>
+      </div>
+    </div>
+    <div class="summary-grid">
+      <div class="summary-card"><div class="s-label">Total Saved</div><div class="s-amount col-teal mono">${fmt(totalSaved)}</div></div>
+      <div class="summary-card"><div class="s-label">Total Target</div><div class="s-amount col-blue mono">${fmt(totalTarget)}</div></div>
+    </div>
+
+    ${db.SavingsGoals.length ? db.SavingsGoals.map(g => {
+      const total = goalTotal(g);
+      const pct   = Math.min(total/g.target*100,100);
+      const rem   = Math.max(g.target-total,0);
+      const mos   = g.monthly>0 ? Math.ceil(rem/g.monthly) : null;
+      return `<div class="goal-card">
+        <div class="goal-top">
+          <div class="goal-name">${g.name}</div>
+          <div class="flex items-center gap-8">
+            <span class="badge ${pct>=100?'badge-green':'badge-teal'}">${pct.toFixed(0)}%</span>
+            <button class="delete-btn" onclick="deleteGoal('${g.id}')">✕</button>
+          </div>
+        </div>
+        <div class="mono" style="font-size:1.2rem !important;color:#5be39a !important;">${fmt(total)}</div>
+        <div style="font-size:12px !important;color:#5a675a !important;margin-bottom:8px !important;">saved of ${fmt(g.target)}</div>
+        <div class="progress-bar" style="height:10px !important;">
+          <div class="progress-fill" style="width:${pct}% !important;background-color:#5be39a !important;"></div>
+        </div>
+        <div class="goal-mini-stats">
+          <div class="goal-mini-stat"><label>Still need</label><span>${fmt(rem)}</span></div>
+          <div class="goal-mini-stat"><label>Monthly</label><span>${g.monthly?fmt(g.monthly):'—'}</span></div>
+          <div class="goal-mini-stat"><label>${mos!==null?'Est. months':'Target date'}</label><span>${mos!==null?(rem>0?mos:'✓'):(g.targetDate?fmtDate(g.targetDate):'—')}</span></div>
+        </div>
+      </div>`;
+    }).join('') : '<div class="empty-state">No savings goals yet. Add your first goal!</div>'}
+
+    ${db.GoalContributions.length ? `<div class="card">
+      <div class="card-title" style="margin-bottom:12px !important;">Contribution History</div>
+      <div class="table-wrap"><table class="data-table">
+        <thead><tr><th>Date</th><th>Goal</th><th class="text-right">Amount</th><th></th></tr></thead>
+        <tbody>${[...db.GoalContributions].sort((a,b)=>new Date(b.date)-new Date(a.date)).map(c=>{
+          const g=db.SavingsGoals.find(g=>g.id===c.goalId);
+          return `<tr>
+            <td class="mono col-dim" style="font-size:11px !important;">${fmtDate(c.date)}</td>
+            <td>${g?g.name:'—'}</td>
+            <td class="mono text-right col-teal">+${fmt(c.amount)}</td>
+            <td><button class="delete-btn" onclick="deleteGC('${c.id}')">✕</button></td>
+          </tr>`;
+        }).join('')}
+        </tbody>
+      </table></div>
+    </div>` : ''}
+  `;
+}
+
+// ============================================================
+// TRANSACTION MODAL
+// ============================================================
+const INCOME_CATS  = ['Salary','Freelance','Business','Investment','Side Hustle','Gift','Tax Refund','Other'];
+const EXPENSE_CATS = () => [...db.BudgetCategories.map(c=>c.name), 'Uncategorized'];
+
+function openTxnModal(type = 'expense') {
+  document.getElementById('txn-type').value = type;
+  document.getElementById('txn-date').value = today();
+  document.getElementById('txn-desc').value = '';
+  document.getElementById('txn-amount').value = '';
+  document.getElementById('txn-modal-title').textContent = type === 'income' ? 'Add Income' : 'Add Expense';
+  populateTxnSelects(type);
+  openModal('txn-modal');
+}
+
+function populateTxnSelects(type) {
+  const cats = type === 'income' ? INCOME_CATS : EXPENSE_CATS();
+  document.getElementById('txn-category').innerHTML = '<option value="">— Category —</option>' + cats.map(c=>`<option>${c}</option>`).join('');
+  document.getElementById('txn-card').innerHTML = '<option value="">— Cash / Debit —</option>' + db.CreditCards.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  document.getElementById('txn-card-group').style.setProperty('display', type==='expense'?'block':'none', 'important');
+}
+
+function onTxnTypeChange() {
+  const type = document.getElementById('txn-type').value;
+  document.getElementById('txn-modal-title').textContent = type === 'income' ? 'Add Income' : 'Add Expense';
+  populateTxnSelects(type);
+}
+
+async function saveTransaction() {
+  const date     = document.getElementById('txn-date').value;
+  const desc     = document.getElementById('txn-desc').value.trim();
+  const amount   = parseFloat(document.getElementById('txn-amount').value);
+  const type     = document.getElementById('txn-type').value;
+  const category = document.getElementById('txn-category').value;
+  const cardId   = type==='expense' ? document.getElementById('txn-card').value : '';
+  if (!date||!desc||!amount) { toast('Please fill all required fields'); return; }
+  const id  = uid();
+  const row = [id, date, desc, amount, type, category, cardId];
+  db.Transactions.push(parseTxn(row));
+  closeModal('txn-modal');
+  renderPage();
+  await api({ action:'appendRow', sheet:'Transactions', row });
+  toast('Transaction saved!');
+}
+
+async function deleteTxn(id) {
+  const idx = db.Transactions.findIndex(t=>t.id===id);
+  if (idx===-1) return;
+  db.Transactions.splice(idx,1);
+  renderPage();
+  await api({ action:'deleteRow', sheet:'Transactions', rowIndex:idx });
+  toast('Deleted');
+}
+
+// ============================================================
+// BUDGET CATEGORIES
+// ============================================================
+async function saveBudgetCategory() {
+  const name   = document.getElementById('bc-name').value.trim();
+  const amount = parseFloat(document.getElementById('bc-amount').value);
+  const color  = document.getElementById('bc-color').value;
+  if (!name||!amount) { toast('Please fill all fields'); return; }
+  const id  = uid();
+  const row = [id, name, amount, color, 0];
+  db.BudgetCategories.push(parseCat(row));
+  closeModal('budget-modal');
+  renderPage();
+  await api({ action:'appendRow', sheet:'BudgetCategories', row });
+  toast('Category added!');
+}
+
+async function deleteCat(id) {
+  const idx = db.BudgetCategories.findIndex(c=>c.id===id);
+  if (idx===-1) return;
+  db.BudgetCategories.splice(idx,1);
+  renderPage();
+  await api({ action:'deleteRow', sheet:'BudgetCategories', rowIndex:idx });
+  toast('Deleted');
+}
+
+// ============================================================
+// CREDIT CARDS
+// ============================================================
+async function saveCreditCard() {
+  const name    = document.getElementById('cc-name').value.trim();
+  const network = document.getElementById('cc-network').value;
+  const balance = parseFloat(document.getElementById('cc-balance').value)||0;
+  const limit   = parseFloat(document.getElementById('cc-limit').value)||0;
+  const apr     = parseFloat(document.getElementById('cc-apr').value)||0;
+  const minPay  = parseFloat(document.getElementById('cc-minpay').value)||0;
+  if (!name) { toast('Please enter card name'); return; }
+  const id  = uid();
+  const row = [id, name, network, balance, limit, apr, minPay];
+  db.CreditCards.push(parseCC(row));
+  closeModal('cc-modal');
+  renderPage();
+  await api({ action:'appendRow', sheet:'CreditCards', row });
+  toast('Card added!');
+}
+
+async function deleteCC(id) {
+  const idx = db.CreditCards.findIndex(c=>c.id===id);
+  if (idx===-1) return;
+  db.CreditCards.splice(idx,1);
+  renderPage();
+  await api({ action:'deleteRow', sheet:'CreditCards', rowIndex:idx });
+  toast('Deleted');
+}
+
+function openCCPayModal() {
+  document.getElementById('ccpay-card').innerHTML = db.CreditCards.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  document.getElementById('ccpay-date').value = today();
+  document.getElementById('ccpay-amount').value = '';
+  openModal('ccpay-modal');
+}
+
+async function saveCCPayment() {
+  const cardId = document.getElementById('ccpay-card').value;
+  const amount = parseFloat(document.getElementById('ccpay-amount').value);
+  const date   = document.getElementById('ccpay-date').value;
+  if (!cardId||!amount||!date) { toast('Please fill all fields'); return; }
+  const card = db.CreditCards.find(c=>c.id===cardId);
+  if (card) card.balance = Math.max(0, card.balance - amount);
+  const id  = uid();
+  const row = [id, cardId, amount, date];
+  db.CCPayments.push(parseCCPay(row));
+  closeModal('ccpay-modal');
+  const allRows = db.CreditCards.map(c=>[c.id,c.name,c.network,c.balance,c.limit,c.apr,c.minPayment]);
+  renderPage();
+  await api({ action:'write', sheet:'CreditCards', rows:allRows });
+  await api({ action:'appendRow', sheet:'CCPayments', row });
+  toast('Payment logged!');
+}
+
+async function deleteCCPay(id) {
+  const idx = db.CCPayments.findIndex(p=>p.id===id);
+  if (idx===-1) return;
+  db.CCPayments.splice(idx,1);
+  renderPage();
+  await api({ action:'deleteRow', sheet:'CCPayments', rowIndex:idx });
+  toast('Deleted');
+}
+
+// ============================================================
+// STUDENT LOANS
+// ============================================================
+async function saveStudentLoan() {
+  const name    = document.getElementById('ln-name').value.trim();
+  const servicer= document.getElementById('ln-servicer').value.trim();
+  const orig    = parseFloat(document.getElementById('ln-original').value)||0;
+  const balance = parseFloat(document.getElementById('ln-balance').value)||0;
+  const rate    = parseFloat(document.getElementById('ln-rate').value)||0;
+  const payment = parseFloat(document.getElementById('ln-payment').value)||0;
+  const type    = document.getElementById('ln-type').value;
+  if (!name) { toast('Please enter loan name'); return; }
+  const id  = uid();
+  const row = [id, name, servicer, orig, balance, rate, payment, type];
+  db.StudentLoans.push(parseLoan(row));
+  closeModal('loan-modal');
+  renderPage();
+  await api({ action:'appendRow', sheet:'StudentLoans', row });
+  toast('Loan added!');
+}
+
+async function deleteLoan(id) {
+  const idx = db.StudentLoans.findIndex(l=>l.id===id);
+  if (idx===-1) return;
+  db.StudentLoans.splice(idx,1);
+  renderPage();
+  await api({ action:'deleteRow', sheet:'StudentLoans', rowIndex:idx });
+  toast('Deleted');
+}
+
+function openLoanPayModal() {
+  document.getElementById('loanpay-loan').innerHTML = db.StudentLoans.map(l=>`<option value="${l.id}">${l.name}</option>`).join('');
+  document.getElementById('loanpay-date').value = today();
+  ['loanpay-amount','loanpay-principal','loanpay-interest'].forEach(id=>document.getElementById(id).value='');
+  openModal('loanpay-modal');
+}
+
+async function saveLoanPayment() {
+  const loanId    = document.getElementById('loanpay-loan').value;
+  const amount    = parseFloat(document.getElementById('loanpay-amount').value);
+  const date      = document.getElementById('loanpay-date').value;
+  const principal = parseFloat(document.getElementById('loanpay-principal').value)||0;
+  const interest  = parseFloat(document.getElementById('loanpay-interest').value)||0;
+  if (!loanId||!amount||!date) { toast('Please fill all fields'); return; }
+  const loan = db.StudentLoans.find(l=>l.id===loanId);
+  if (loan && principal>0) loan.balance = Math.max(0, loan.balance - principal);
+  const id  = uid();
+  const row = [id, loanId, amount, date, principal, interest];
+  db.LoanPayments.push(parseLoanPay(row));
+  closeModal('loanpay-modal');
+  const allRows = db.StudentLoans.map(l=>[l.id,l.name,l.servicer,l.originalBalance,l.balance,l.rate,l.monthlyPayment,l.type]);
+  renderPage();
+  await api({ action:'write', sheet:'StudentLoans', rows:allRows });
+  await api({ action:'appendRow', sheet:'LoanPayments', row });
+  toast('Payment logged!');
+}
+
+async function deleteLoanPay(id) {
+  const idx = db.LoanPayments.findIndex(p=>p.id===id);
+  if (idx===-1) return;
+  db.LoanPayments.splice(idx,1);
+  renderPage();
+  await api({ action:'deleteRow', sheet:'LoanPayments', rowIndex:idx });
+  toast('Deleted');
+}
+
+// ============================================================
+// SAVINGS GOALS
+// ============================================================
+async function saveSavingsGoal() {
+  const name    = document.getElementById('g-name').value.trim();
+  const target  = parseFloat(document.getElementById('g-target').value)||0;
+  const current = parseFloat(document.getElementById('g-current').value)||0;
+  const tDate   = document.getElementById('g-date').value;
+  const monthly = parseFloat(document.getElementById('g-monthly').value)||0;
+  if (!name||!target) { toast('Please fill required fields'); return; }
+  const id  = uid();
+  const row = [id, name, target, current, tDate, monthly];
+  db.SavingsGoals.push(parseGoal(row));
+  closeModal('goal-modal');
+  renderPage();
+  await api({ action:'appendRow', sheet:'SavingsGoals', row });
+  toast('Goal added!');
+}
+
+async function deleteGoal(id) {
+  const idx = db.SavingsGoals.findIndex(g=>g.id===id);
+  if (idx===-1) return;
+  db.SavingsGoals.splice(idx,1);
+  renderPage();
+  await api({ action:'deleteRow', sheet:'SavingsGoals', rowIndex:idx });
+  toast('Deleted');
+}
+
+function openGCModal() {
+  document.getElementById('gc-goal').innerHTML = db.SavingsGoals.map(g=>`<option value="${g.id}">${g.name}</option>`).join('');
+  document.getElementById('gc-date').value = today();
+  document.getElementById('gc-amount').value = '';
+  openModal('gc-modal');
+}
+
+async function saveGoalContrib() {
+  const goalId = document.getElementById('gc-goal').value;
+  const amount = parseFloat(document.getElementById('gc-amount').value);
+  const date   = document.getElementById('gc-date').value;
+  if (!goalId||!amount||!date) { toast('Please fill all fields'); return; }
+  const id  = uid();
+  const row = [id, goalId, amount, date];
+  db.GoalContributions.push(parseGC(row));
+  closeModal('gc-modal');
+  renderPage();
+  await api({ action:'appendRow', sheet:'GoalContributions', row });
+  toast('Contribution saved!');
+}
+
+async function deleteGC(id) {
+  const idx = db.GoalContributions.findIndex(c=>c.id===id);
+  if (idx===-1) return;
+  db.GoalContributions.splice(idx,1);
+  renderPage();
+  await api({ action:'deleteRow', sheet:'GoalContributions', rowIndex:idx });
+  toast('Deleted');
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(window._tt);
+  window._tt = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+// ============================================================
+// SERVICE WORKER
+// ============================================================
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('DOMContentLoaded', () => {
+  // Populate script modal code
+  if (document.getElementById('script-code-area')) {
+    document.getElementById('script-code-area').value = APPS_SCRIPT_SOURCE;
+  }
+
+  // Auto-connect if saved
+  const savedUrl = localStorage.getItem('ledger_url');
+  if (savedUrl) {
+    SHEET_URL = savedUrl;
+    document.getElementById('setup-overlay').style.setProperty('display','none','important');
+    document.getElementById('app').style.setProperty('display','block','important');
+    loadAll().then(() => showPage('dashboard'));
+  }
+
+  // Close more menu on outside tap
+  document.addEventListener('click', e => {
+    if (moreOpen && !e.target.closest('.more-menu') && !e.target.closest('#nav-more')) {
+      moreOpen = false;
+      document.getElementById('more-menu').classList.remove('open');
+      document.getElementById('nav-more').classList.remove('active');
+    }
+  });
+});
+</script>
+
+</body>
+</html>
