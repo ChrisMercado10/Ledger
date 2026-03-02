@@ -9,9 +9,12 @@
 <meta name="apple-mobile-web-app-title" content="Ledger" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#0d0f0e" />
-<title>Ledger — Personal Finance</title>
+<title>Ledger</title>
 <link rel="manifest" href="./manifest.json" />
 <link rel="apple-touch-icon" href="./icon-192.png" />
+<link rel="apple-touch-icon" sizes="152x152" href="./icon-192.png" />
+<link rel="apple-touch-icon" sizes="167x167" href="./icon-192.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="./icon-192.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -776,6 +779,50 @@ option {
 
 </head>
 <body>
+
+<!-- INSTALL BANNER — shown only when opened in Safari browser, not from Home Screen -->
+
+<div id="install-banner" style="
+  display:none !important;
+  position:fixed !important;
+  top:0 !important; left:0 !important; right:0 !important;
+  background-color:#1c201c !important;
+  border-bottom:2px solid #a8e063 !important;
+  padding:14px 16px !important;
+  padding-top:calc(14px + env(safe-area-inset-top,0px)) !important;
+  z-index:9999 !important;
+  text-align:center !important;
+">
+  <div style="font-family:'DM Sans',sans-serif !important;font-size:13px !important;color:#e8ede8 !important;margin-bottom:6px !important;">
+    📲 For the full app experience with no browser bar:
+  </div>
+  <div style="font-family:'DM Sans',sans-serif !important;font-size:12px !important;color:#a8e063 !important;">
+    Tap the <strong style="color:#e8ede8 !important;">Share button ↑</strong> → <strong style="color:#e8ede8 !important;">"Add to Home Screen"</strong> → then open from your Home Screen
+  </div>
+  <button onclick="document.getElementById('install-banner').style.setProperty('display','none','important')" style="
+    margin-top:8px !important;
+    background:none !important;
+    border:1px solid #2a302a !important;
+    border-radius:6px !important;
+    color:#5a675a !important;
+    font-size:11px !important;
+    padding:4px 12px !important;
+    cursor:pointer !important;
+    font-family:'DM Sans',sans-serif !important;
+  ">Dismiss</button>
+</div>
+
+<script>
+  // Show install banner only when running in Safari browser (not standalone Home Screen app)
+  (function() {
+    var isStandalone = window.navigator.standalone === true;
+    var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    if (isIOS && !isStandalone) {
+      var banner = document.getElementById('install-banner');
+      if (banner) banner.style.setProperty('display', 'block', 'important');
+    }
+  })();
+</script>
 
 <!-- ================================================
      SETUP OVERLAY
