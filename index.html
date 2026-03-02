@@ -1117,25 +1117,22 @@ option {
 // ============================================================
 // APPS SCRIPT BACKEND CODE (displayed to user for copy/paste)
 // ============================================================
-const APPS_SCRIPT_SOURCE = `function doPost(e) {
+const APPS_SCRIPT_SOURCE = `// ---- Ledger Backend (Safari/iOS compatible — GET + base64 payload) ----
+
+function doGet(e) {
   try {
-    var data = JSON.parse(e.postData.contents);
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var result = {};
-    if (data.action === 'ping') {
-      result = { ok: true, name: ss.getName() };
-    } else if (data.action === 'read') {
+
+    // If a payload param is present, decode and dispatch it
+    if (e && e.parameter && e.parameter.payload) {
+      var decoded = decodePayload(e.parameter.payload);
+      result = dispatch(ss, decoded);
+    } else {
+      // Plain GET with no payload = read all data
       result = readAll(ss);
-    } else if (data.action === 'appendRow') {
-      appendRow(ss, data.sheet, data.row);
-      result = { ok: true };
-    } else if (data.action === 'deleteRow') {
-      deleteRow(ss, data.sheet, data.rowIndex);
-      result = { ok: true };
-    } else if (data.action === 'write') {
-      writeSheet(ss, data.sheet, data.rows);
-      result = { ok: true };
     }
+
     return ContentService.createTextOutput(JSON.stringify(result))
       .setMimeType(ContentService.MimeType.JSON);
   } catch(err) {
@@ -1144,15 +1141,42 @@ const APPS_SCRIPT_SOURCE = `function doPost(e) {
   }
 }
 
-function doGet(e) {
+function doPost(e) {
   try {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
-    return ContentService.createTextOutput(JSON.stringify(readAll(ss)))
+    var data = JSON.parse(e.postData.contents);
+    var result = dispatch(ss, data);
+    return ContentService.createTextOutput(JSON.stringify(result))
       .setMimeType(ContentService.MimeType.JSON);
   } catch(err) {
     return ContentService.createTextOutput(JSON.stringify({ error: err.toString() }))
       .setMimeType(ContentService.MimeType.JSON);
   }
+}
+
+function decodePayload(encoded) {
+  var decoded = Utilities.base64Decode(decodeURIComponent(encoded));
+  var str = Utilities.newBlob(decoded).getDataAsString();
+  return JSON.parse(str);
+}
+
+function dispatch(ss, data) {
+  var result = {};
+  if (data.action === 'ping') {
+    result = { ok: true, name: ss.getName() };
+  } else if (data.action === 'read') {
+    result = readAll(ss);
+  } else if (data.action === 'appendRow') {
+    appendRow(ss, data.sheet, data.row);
+    result = { ok: true };
+  } else if (data.action === 'deleteRow') {
+    deleteRow(ss, data.sheet, data.rowIndex);
+    result = { ok: true };
+  } else if (data.action === 'write') {
+    writeSheet(ss, data.sheet, data.rows);
+    result = { ok: true };
+  }
+  return result;
 }
 
 var SHEETS = ['Transactions','BudgetCategories','CreditCards','CCPayments','StudentLoans','LoanPayments','SavingsGoals','GoalContributions'];
@@ -1261,12 +1285,14 @@ function disconnectSheet() {
 // API LAYER
 // ============================================================
 async function api(body, url = SHEET_URL) {
-  const r = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-  return r.json();
+  // Safari on iOS blocks cross-origin POST fetch to Google Apps Script.
+  // Solution: encode the payload as a base64 URL param and use GET,
+  // which Apps Script's doGet() handles without CORS preflight issues.
+  const encoded = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(body)))));
+  const getUrl  = url + '?payload=' + encoded;
+  const r = await fetch(getUrl, { method: 'GET', mode: 'cors' });
+  const text = await r.text();
+  try { return JSON.parse(text); } catch(e) { return {}; }
 }
 
 async function loadAll() {
